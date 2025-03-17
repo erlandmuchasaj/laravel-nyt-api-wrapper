@@ -1,13 +1,6 @@
 ## [Lend flow Assessment](https://www.lendflow.com/)
 - [NYT Best Sellers](https://developer.nytimes.com/docs/books-product/1/routes/lists/best-sellers/history.json/get) List & Filter
 
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within this application,
-please send an e-mail to [erland.muchasaj@gmail.com](mailto:erland.muchasaj@gmail.com).
-All security vulnerabilities will be promptly addressed.
-
 ## Requirements:
 - PHP 8.2+
 - MySQL 8.0
@@ -22,7 +15,7 @@ All security vulnerabilities will be promptly addressed.
 
 - Clone the repository
 ````bash    
-git clone 
+git clone https://github.com/erlandmuchasaj/laravel-nyt-api-wrapper.git
 ````
 
 - Install dependencies
@@ -72,3 +65,15 @@ The API is configured with a rate limiter of 60 requests per minute per user/ID 
 ````bash
   composer test
 ````
+
+#### Miscellaneous
+The application uses 2 custom middlewares. 
+1. `laravel-gzip` a custom-made laravel package to gzip api responses for a lighter payload. 
+2. `AddXHeader` This is a global middleware to add some security headers on responses.
+3. `IdempotencyMiddleware` This middleware is used to check if the request is idempotent or not.
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within this application,
+please send an e-mail to [erland.muchasaj@gmail.com](mailto:erland.muchasaj@gmail.com).
+All security vulnerabilities will be promptly addressed.
