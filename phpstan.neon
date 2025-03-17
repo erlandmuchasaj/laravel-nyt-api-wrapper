@@ -1,0 +1,21 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+
+parameters:
+
+    paths:
+        - app/
+
+    # Level 10 is the highest level
+    level: 10
+
+    parallel:
+        maximumNumberOfProcesses: 4
+
+#    ignoreErrors:
+#        - '#PHPDoc tag @var#'
+# 			 - '#Unsafe usage of new static#'
+#
+#    excludePaths:
+#        - ./*/*/FileToBeExcluded.php
