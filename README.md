@@ -36,14 +36,16 @@ php artisan key:generate
 - Update the .env file with your credentials to connect to NYT Bestseller Book API.
 ````bash
 NYT_KEY=
-NYT_SECRET=
-NYT_APP_ID=
-NYT_ENABLED=true
+NYT_ENABLED=true #this is used to enable or disable the NYT API
 ````
 
-Access urls are:
-- _/api/v1/bestsellers_ - to get the bestsellers list
-- _/health_ - to check the health of the application
+### Access urls are:
+- `/api/v1/bestsellers` - to get the bestsellers list
+- `/health` - to check the health of the application
+
+
+### API Documentation
+- `/openapi/index.html` - to view the API documentation
 
 [!Info]
 The API is configured with a rate limiter of 60 requests per minute per user/ID or Ip address.

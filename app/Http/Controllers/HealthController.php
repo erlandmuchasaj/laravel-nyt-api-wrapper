@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\HealthStatus;
 use App\Services\NYTService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,14 +20,14 @@ class HealthController extends Controller
             $nytService->fetchOverviews(['published_date' => '2222-12-31']);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
+                'status' => HealthStatus::ERROR,
                 'timestamp' => now()->toDateTimeString(),
                 'message' => $e->getMessage(),
             ], 500);
         }
 
         return response()->json([
-            'status' => 'ok',
+            'status' => HealthStatus::SUCCESS,
             'timestamp' => now()->toDateTimeString(),
             'message' => __('All systems operational'),
         ]);
