@@ -47,9 +47,8 @@ NYT_ENABLED=true #this is used to enable or disable the NYT API
 ### API Documentation
 - `/openapi/index.html` - to view the API documentation
 
-[!Info]
-The API is configured with a rate limiter of 60 requests per minute per user/ID or Ip address.
-
+> [!INFO]
+> The API is configured with a rate limiter of 60 requests per minute per `user/ID` or `Ip address`.
 
 ### Code Formating and Analysis.
 - Run the following command to format the code
