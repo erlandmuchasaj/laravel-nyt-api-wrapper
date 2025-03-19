@@ -27,9 +27,38 @@ class Isbn implements ValidationRule
 
         $value = strtoupper((string) preg_replace('/[^0-9X]/', '', (string) $value));
 
-        return preg_match(
-        '/^(?:ISBN(-1(?:(0)|3))?:?\ )?(?(1)(?(2)(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$)[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]|(?=[0-9]{13}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)97[89][- ]?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9])|(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X])$/',
-        $value
-        ) > 0;
+        return $this->validateISBN10($value) || $this->validateISBN13($value);
+    }
+
+    private function validateISBN10(string $isbn): bool
+    {
+        if (strlen($isbn) !== 10) {
+            return false;
+        }
+
+        $sum = 0;
+        for ($i = 0; $i < 10; $i++) {
+            if ($i === 9 && $isbn[$i] === 'X') {
+                $sum += 10;
+            } else {
+                $sum += (10 - $i) * intval($isbn[$i]);
+            }
+        }
+
+        return $sum % 11 === 0;
+    }
+
+    private function validateISBN13(string $isbn): bool
+    {
+        if (strlen($isbn) !== 13) {
+            return false;
+        }
+
+        $sum = 0;
+        for ($i = 0; $i < 13; $i++) {
+            $sum += intval($isbn[$i]) * ($i % 2 === 0 ? 1 : 3);
+        }
+
+        return $sum % 10 === 0;
     }
 }
