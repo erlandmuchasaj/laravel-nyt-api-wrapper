@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\NYT\BestSellerCache;
+use App\Services\NYT\Contracts\CacheInterface;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -39,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(\App\Providers\TelescopeServiceProvider::class);
         }
+
+        $this->app->bind(CacheInterface::class, BestSellerCache::class);
     }
 
     /**

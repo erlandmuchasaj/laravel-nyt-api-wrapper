@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\HealthStatus;
-use App\Services\NYTService;
+use App\Services\NYT\NYTService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

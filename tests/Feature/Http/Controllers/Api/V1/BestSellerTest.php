@@ -2,8 +2,9 @@
 
 namespace Tests\Feature\Http\Controllers\Api\V1;
 
-use App\Services\BestSellerResponse;
-use App\Services\NYTService;
+use App\Services\NYT\BestSellerResponse;
+use App\Services\NYT\Contracts\CacheInterface;
+use App\Services\NYT\NYTService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Mockery;
@@ -25,7 +26,13 @@ class BestSellerTest extends TestCase
     {
         $mockResponse = new BestSellerResponse($this->getSuccessData(), true);
 
-        $mockedService = Mockery::mock(NYTService::class);
+        $cache = mock(CacheInterface::class);
+        $cache->shouldReceive('has')->andReturn(true);
+        $cache->shouldReceive('get')->andReturn(new BestSellerResponse([]));
+
+        $service = new NYTService($cache);
+
+        $mockedService = Mockery::mock($service);
         $mockedService->shouldReceive('fetchBestSellers')->andReturn($mockResponse);
         $this->app->instance(NYTService::class, $mockedService);
 
@@ -58,7 +65,13 @@ class BestSellerTest extends TestCase
     #[Test]
     public function it_handles_api_errors_gracefully(): void
     {
-        $mockedService = Mockery::mock(NYTService::class);
+        $cache = mock(CacheInterface::class);
+        $cache->shouldReceive('has')->andReturn(true);
+        $cache->shouldReceive('get')->andReturn(new BestSellerResponse([]));
+
+        $service = new NYTService($cache);
+
+        $mockedService = Mockery::mock($service);
         $mockedService->shouldReceive('fetchBestSellers')
             ->andThrow(new \Exception('API Error', 500));
         $this->app->instance(NYTService::class, $mockedService);
@@ -81,7 +94,13 @@ class BestSellerTest extends TestCase
             'copyright' => '',
         ], false);
 
-        $mockedService = Mockery::mock(NYTService::class);
+        $cache = mock(CacheInterface::class);
+        $cache->shouldReceive('has')->andReturn(true);
+        $cache->shouldReceive('get')->andReturn(new BestSellerResponse([]));
+
+        $service = new NYTService($cache);
+
+        $mockedService = Mockery::mock($service);
         $mockedService->shouldReceive('fetchBestSellers')->andReturn($mockResponse);
         $this->app->instance(NYTService::class, $mockedService);
 

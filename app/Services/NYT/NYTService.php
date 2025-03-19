@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\NYT;
 
+use App\Services\NYT\Contracts\CacheInterface;
 use Exception;
 use Illuminate\Http\Client\PendingRequest;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,6 +22,8 @@ class NYTService
 
     protected int $retryDelay = 100;
 
+    private CacheInterface $cache;
+
     /**
      * @var array<string, string> The available endpoints.
      */
@@ -30,10 +32,11 @@ class NYTService
         'overview' => '/lists/overview.json',
     ];
 
-    public function __construct()
+    public function __construct(CacheInterface $cache)
     {
         $this->baseUrl = config()->string('services.nyt.baseUrl');
         $this->apiKey = config()->string('services.nyt.key');
+        $this->cache = $cache;
     }
 
     /**
@@ -41,7 +44,7 @@ class NYTService
      *
      * @param  array<string, mixed>  $params  The validated query parameters.
      * @param  bool  $cacheBypassed  When true - use cache, false - bypasses cache.
-     * @return \App\Services\BestSellerResponse The JSON-decoded response.
+     * @return \App\Services\NYT\BestSellerResponse The JSON-decoded response.
      *
      * @throws \Exception When the API call fails and no cache is available.
      */
@@ -61,18 +64,20 @@ class NYTService
             $params['isbn'] = $this->formatIsbns($isbns);
         }
 
-        $cacheKey = $this->generateCacheKey($params);
+        $cacheKey = $this->cache->generateKey($params);
 
-        if (! $cacheBypassed && Cache::has($cacheKey)) {
-            return $this->getCachedResponse($cacheKey);
+        if (! $cacheBypassed && $this->cache->has($cacheKey)) {
+            return $this->cache->get($cacheKey);
         }
 
-        $response = $this->client()->get($this->urls['best-seller'], $params);
+        $response = $this
+            ->client()
+            ->get($this->urls['best-seller'], $params);
 
         if (! $response->successful()) {
             // Fallback to cached data if available.
-            if (Cache::has($cacheKey)) {
-                return $this->getCachedResponse($cacheKey);
+            if ($this->cache->has($cacheKey)) {
+                return $this->cache->get($cacheKey);
             }
             throw new \Exception('NYT API request failed with status '.$response->status());
         }
@@ -85,7 +90,7 @@ class NYTService
         // Set TTL: if offset is provided (indicating pagination), use a shorter TTL.
         $ttl = isset($params['offset']) ? 300 : 3600;
 
-        Cache::put($cacheKey, $data, $ttl);
+        $this->cache->put($cacheKey, $data, $ttl);
 
         return BestSellerResponse::make($data, $cacheBypassed);
     }
@@ -145,25 +150,5 @@ class NYTService
     private function formatIsbns(array $isbns): string
     {
         return implode(';', $isbns);
-    }
-
-    /**
-     * @param  array<string, mixed>  $params
-     */
-    public function generateCacheKey(array $params): string
-    {
-        ksort($params);
-
-        return 'nyt:bs:'.sha1(serialize($params));
-    }
-
-    protected function getCachedResponse(string $cacheKey): BestSellerResponse
-    {
-        /**
-         * @var array<string, mixed> $data
-         */
-        $data = Cache::get($cacheKey);
-
-        return BestSellerResponse::make($data);
     }
 }

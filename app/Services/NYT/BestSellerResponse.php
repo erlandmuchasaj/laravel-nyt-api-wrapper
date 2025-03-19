@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\NYT;
 
 final class BestSellerResponse
 {
@@ -30,7 +30,7 @@ final class BestSellerResponse
     /**
      * @param  array<string, mixed>  $args
      */
-    public static function make(array $args, bool $cacheBypassed = false): self
+    public static function make(array $args, bool $cacheBypassed = false): static
     {
         return new self($args, $cacheBypassed);
     }
